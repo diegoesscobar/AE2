@@ -1,0 +1,31 @@
+{
+  "name": "ae2",
+  "version": "1.0.0",
+  "description": "Simulador de procesos de memoria con POO",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegoesscobar/AE2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/diegoesscobar/AE2/issues"
+  },
+  "homepage": "https://github.com/diegoesscobar/AE2#readme",
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@vitest/coverage-v8": "^5.0.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}
