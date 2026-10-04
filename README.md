@@ -1,25 +1,26 @@
-# Simulador de Procesos y Memoria con POO (AE2)
+# AE2 - Simulador de Procesos y Gestión de Memoria
 
-**Carrera:** Ingeniería en Sistemas de Información  
-**Materia:** Paradigmas y Lenguajes de Programación II / Sistemas Operativos  
-**Alumno:** Diego Gerónimo Escobar  
+Diego Gerónimo Escobar
 
----
+Simulador de administración de procesos y asignación de memoria dinámica implementado en TypeScript y Node.js.
 
-## Acerca del proyecto
+## Características
+- **Planificación de CPU:** Round-Robin con Quantum configurable.
+- **Gestión de Memoria:** Contigua con algoritmo First-Fit y coalescencia de bloques libres.
+- **Transiciones de Estado:** Manejo de colas de Nuevos, Listos, Bloqueados por E/S y Terminados.
 
-Este proyecto es una biblioteca en TypeScript que simula el comportamiento de un sistema operativo gestionando procesos, asignación de memoria contigua y planificación de CPU con Round Robin. 
+## Requisitos
+- Node.js (v18+)
+- npm
 
-El funcionamiento se verifica únicamente mediante pruebas automatizadas sin depender de tiempos reales ni interfaz gráfica.
-
-## Comandos principales
+## Instalación y Ejecución
 
 ```bash
-# Instalar dependencias del proyecto
+# Instalar dependencias
 npm install
 
-# Correr las pruebas unitarias con Vitest
-npm run test
+# Ejecutar la simulación principal
+npm start
 
-# Ver la cobertura de código
-npm run test:coverage
+# Ejecutar la suite de pruebas unitarias
+npm test
