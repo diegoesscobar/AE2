@@ -41,4 +41,27 @@ export class Memoria {
         }
         return true;    
     }   
-}
+        //Libera la memoria ocupada por un proceso dado su id
+        public liberarProceso(idProceso: number): boolean {
+            const bloque = this.bloques.find(b => !b.estaLibre() && b.proceso?.id === idProceso);
+            if (!bloque) return false;
+
+            bloque.proceso = null;
+            this.consolidarBloques();
+            return true;
+        }
+
+        //Fusiona bloques libres contiguos para evitar la fragmentación externa
+        public consolidarBloques(): void {
+            for(let i = 0; i < this.bloques.length - 1; i++) {
+                const bloqueActual = this.bloques[i]!;
+                const bloqueSiguiente = this.bloques[i + 1]!;
+
+                if (bloqueActual.estaLibre() && bloqueSiguiente.estaLibre()) {
+                    bloqueActual.tamanio += bloqueSiguiente.tamanio;
+                    this.bloques.splice(i + 1, 1);
+                    i--; //Volvemos a verificarr el bloque fusionado con el siguiente
+                }
+            }
+        }
+    }   
