@@ -20,6 +20,6 @@ describe("Pruebas para la clase Proceso", () => {
     const proceso = new Proceso(2, 100, 8, evento);
 
     expect(proceso.eventoES).toEqual(evento);
-    expect(proceso.tiempoBloqueRestante).toBe(0);
+    expect(proceso.tiempoBloqueoRestante).toBe(0);
   });
 });
