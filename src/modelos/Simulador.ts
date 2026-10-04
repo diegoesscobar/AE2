@@ -23,23 +23,18 @@ export class Simulador {
     this.procesosTerminados = [];
   }
 
-  // Agrega un proceso al sistema en estado NUEVO
   public agregarProceso(proceso: Proceso): void {
     proceso.cambiarEstado(EstadoProceso.NUEVO);
     this.colaNuevos.push(proceso);
   }
 
-  // Avanza un ciclo (tick) en el simulador
   public ejecutarTick(): void {
     this.reloj++;
 
-    // 1. Intentar asignar memoria a procesos en colaNuevos o ESPERANDO_MEMORIA
     this.intentarAsignarMemoria();
 
-    // 2. Decrementar tiempo de bloqueo en colaBloqueados
     this.procesarBloqueados();
 
-    // 3. Ejecutar CPU
     this.procesarCPU();
   }
 
@@ -75,7 +70,6 @@ export class Simulador {
   }
 
   private procesarCPU(): void {
-    // Si no hay proceso ejecutando, tomar el primero de la cola de listos
     if (!this.procesoEjecutando && this.colaListos.length > 0) {
       this.procesoEjecutando = this.colaListos.shift()!;
       this.procesoEjecutando.cambiarEstado(EstadoProceso.EJECUTANDO);
@@ -88,7 +82,6 @@ export class Simulador {
     p.tiempoCpuRestante--;
     p.quantumConsumido++;
 
-    // Verificar si finalizó la ejecución
     if (p.estaTerminado()) {
       p.cambiarEstado(EstadoProceso.TERMINADO);
       this.memoria.liberarProceso(p.id);
@@ -97,17 +90,15 @@ export class Simulador {
       return;
     }
 
-    // Verificar disparo de evento de E/S
     if (p.eventoES && (p.tiempoCpuTotal - p.tiempoCpuRestante) === p.eventoES.ticksCpuParaDisparo) {
       p.cambiarEstado(EstadoProceso.BLOQUEADO);
       p.tiempoBloqueoRestante = p.eventoES.duracionBloqueo;
-      p.eventoES = null; // Se consume el evento de E/S
+      p.eventoES = null;
       this.colaBloqueados.push(p);
       this.procesoEjecutando = null;
       return;
     }
 
-    // Verificar fin de quantum (Round Robin)
     if (p.quantumConsumido >= this.quantum) {
       p.cambiarEstado(EstadoProceso.LISTO);
       p.quantumConsumido = 0;
