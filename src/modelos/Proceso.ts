@@ -1,39 +1,41 @@
 import { EstadoProceso } from './EstadoProceso.js';
 
-export class Proceso {
-    public id: number;
-    public tamanioMemoria: number;
-    public tiempoRestante: number;
-    public prioridad: number;
-    public estado: EstadoProceso;
-
-    constructor(
-        id: number, 
-        tamanioMemoria: number, 
-        tiempoRestante: number,
-        prioridad: number = 1
-
-    ) {
-        this.id = id;
-        this.tamanioMemoria = tamanioMemoria;
-        this.tiempoRestante = tiempoRestante;
-        this.prioridad = prioridad;
-        this.estado = EstadoProceso.NUEVO;
+export interface EventoES {
+    ticksCpuParaDisparo: number; //Ticks de CPU consumidos antes de bloquearse
+    duracionBloqueo: number; //Cuántos ticks permanece bloqueado
     }
+    
+    export class Proceso {
+        public id: number;
+        public tamanioMemoria: number;
+        public tiempoCpuTotal: number;
+        public tiempoCpuRestante: number;
+        public estado: EstadoProceso;
+        public quantumConsumido: number;
+        public eventoES: EventoES | null;
+        public tiempoBloqueRestante: number;
 
-    public cambiarEstado(nuevoEstado: EstadoProceso) {
-        this.estado = nuevoEstado;
-    }
-    public ejecutarCiclo(quantum: number): void {
-        if (this.tiempoRestante > 0) {
-            this.tiempoRestante = Math.max(0, this.tiempoRestante - quantum);
+        constructor(
+            id: number,
+            tamanioMemoria: number,
+            tiempoCpuTotal: number, 
+            eventoES: EventoES | null = null
+        ) {
+            this.id = id;
+            this.tamanioMemoria = tamanioMemoria;
+            this.tiempoCpuTotal = tiempoCpuTotal;
+            this.tiempoCpuRestante = tiempoCpuTotal;
+            this.estado = EstadoProceso.NUEVO;
+            this.quantumConsumido = 0;
+            this.eventoES = eventoES;
+            this.tiempoBloqueRestante = 0;
         }
-        if (this.tiempoRestante === 0) {
-            this.estado = EstadoProceso.TERMINADO;            
-        }
-    }
 
-    public estaTerminado(): boolean {
-        return this.estado === EstadoProceso.TERMINADO;
-    }
+        public cambiarEstado(nuevoEstado: EstadoProceso): void {
+            this.estado = nuevoEstado;
+        }
+
+        public estaTerminado(): boolean {
+            return this.tiempoCpuRestante === 0;
+        }
 }
