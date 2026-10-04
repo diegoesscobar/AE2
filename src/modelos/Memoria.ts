@@ -11,7 +11,7 @@ export class Memoria {
         this.bloques = [new BloqueMemoria(0, tamanioTotal)]; 
     }
 
-    //Busca el primer bloque libre donde quepa el proceso (FIrs-Fit)
+    //Busca el primer bloque libre donde quepa el proceso (First-Fit)
     public buscarBloqueLibre(proceso: Proceso): BloqueMemoria | null {
         const bloqueEncontrado = this.bloques.find(
             (bloque) => bloque.estaLibre() && bloque.tamanio >= proceso.tamanioMemoria
