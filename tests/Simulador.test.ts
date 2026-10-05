@@ -100,4 +100,37 @@ describe("Pruebas para la clase Simulador", () => {
     simulador.ejecutarTick();
     expect(simulador.colaBloqueados.length).toBe(0);
   });
+  it("Debe mantener un proceso en colaNuevos si no hay suficiente memoria disponible", () => {
+    const simulador = new Simulador(300, 2); // Solo 300 de memoria total
+    const procesoGrande1 = new Proceso(1, 200, 5);
+    const procesoGrande2 = new Proceso(2, 200, 5); // 200 + 200 = 400 > 300
+
+    simulador.agregarProceso(procesoGrande1);
+    simulador.agregarProceso(procesoGrande2);
+
+    // Tick 1: Se asigna memoria al proceso 1, pero el proceso 2 no entra y queda en colaNuevos
+    simulador.ejecutarTick();
+
+    expect(simulador.procesoEjecutando?.id).toBe(1);
+    expect(simulador.colaNuevos.length).toBe(1);
+    expect(simulador.colaNuevos[0]?.id).toBe(2);
+  });
+
+  it("Debe liberar memoria y admitir el proceso en colaNuevos cuando termina el primero", () => {
+    const simulador = new Simulador(300, 2);
+    const proceso1 = new Proceso(1, 200, 2); // Dura solo 2 ticks
+    const proceso2 = new Proceso(2, 200, 3);
+
+    simulador.agregarProceso(proceso1);
+    simulador.agregarProceso(proceso2);
+
+    simulador.ejecutarTick(); // Tick 1: Proceso 1 en CPU
+    simulador.ejecutarTick(); // Tick 2: Proceso 1 termina y libera memoria
+
+    // Tick 3: Proceso 2 debe pasar de colaNuevos a CPU
+    simulador.ejecutarTick();
+
+    expect(simulador.procesoEjecutando?.id).toBe(2);
+    expect(simulador.colaNuevos.length).toBe(0);
+  });
 });
