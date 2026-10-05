@@ -161,4 +161,27 @@ describe("Pruebas para la clase Simulador", () => {
     expect(simulador.procesoEjecutando?.id).toBe(1);
     expect(simulador.colaListos[0]?.id).toBe(2);
   });
+  it("Debe avanzar el reloj del simulador aunque la cola de nuevos este vacia", () => {
+    const simulador = new Simulador(1024, 3);
+    // Ejecutamos ticks sin agregar ningun proceso
+    // Esto deja sin ejecutar todas las ramas de asignacion de memoria y planificacion
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+
+    expect(simulador.reloj).toBe(2);
+    expect(simulador.procesoEjecutando).toBeNull();
+  });
+
+  it("Debe mantener el estado inicial sin alteraciones si no se ejecutan ticks", () => {
+    const simulador = new Simulador(512, 2);
+    const proceso = new Proceso(99, 100, 4);
+
+    simulador.agregarProceso(proceso);
+
+    // Solo se agrega pero NO se llama a ejecutarTick()
+    // Esto deja sin cubrir la logica de paso de NUEVO a EJECUTANDO/LISTO
+    expect(simulador.reloj).toBe(0);
+    expect(simulador.colaNuevos.length).toBe(1);
+    expect(simulador.procesoEjecutando).toBeNull();
+  });
 });
