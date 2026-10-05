@@ -53,6 +53,51 @@ describe("Pruebas para la clase Simulador", () => {
     simulador.ejecutarTick();
 
     expect(simulador.colaBloqueados.length).toBe(1);
-    expect(simulador.colaBloqueados[0]?.estado).toBe(EstadoProceso.BLOQUEADO);
+ expect(simulador.colaBloqueados[0]?.estado).toBe(EstadoProceso.BLOQUEADO);
+  });
+});
+
+  it('Debe reinstanciar y verificar propiedades básicas del simulador', () => {
+    const simulador = new Simulador(512, 1);
+    expect(simulador).toBeDefined();
+    expect(simulador.reloj).toBe(0);
+    expect(simulador.colaNuevos.length).toBe(0);
+  });
+
+  it('Debe ejecutar ticks consecutivos sin procesos sin fallar', () => {
+    const simulador = new Simulador(1024, 2);
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+    expect(simulador.reloj).toBe(2);
+  });
+  describe('Pruebas para alcanzar 95%+ de cobertura en Simulador', () => {
+  it('Debe completar el ciclo de vida de un proceso (CPU -> Finalizado) y liberar memoria', () => {
+    const simulador = new Simulador(1024, 5);
+    const proceso = new Proceso(10, 200, 2); // Proceso corto de 2 ticks
+    simulador.agregarProceso(proceso);
+
+    // Tick 1: Entra a CPU
+    simulador.ejecutarTick();
+    expect(simulador.procesoEjecutando?.id).toBe(10);
+
+    // Tick 2: Termina ejecucion y libera memoria
+    simulador.ejecutarTick();
+    expect(simulador.procesoEjecutando).toBeNull();
+  });
+
+ it('Debe procesar la salida de la cola de bloqueados sin fallar', () => {
+    const simulador = new Simulador(1024, 5);
+    const eventoES = { ticksCpuParaDisparo: 1, duracionBloqueo: 1 };
+    const proceso = new Proceso(20, 100, 4, eventoES);
+
+    simulador.agregarProceso(proceso);
+
+    // Tick 1: Pasa a CPU, dispara E/S y entra a colaBloqueados
+    simulador.ejecutarTick();
+    expect(simulador.colaBloqueados.length).toBe(1);
+
+    // Tick 2: Se procesa el desbloqueo
+    simulador.ejecutarTick();
+    expect(simulador.colaBloqueados.length).toBe(0);
   });
 });
