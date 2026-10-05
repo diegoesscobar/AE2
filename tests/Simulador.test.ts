@@ -164,7 +164,6 @@ describe("Pruebas para la clase Simulador", () => {
   it("Debe avanzar el reloj del simulador aunque la cola de nuevos este vacia", () => {
     const simulador = new Simulador(1024, 3);
     // Ejecutamos ticks sin agregar ningun proceso
-    // Esto deja sin ejecutar todas las ramas de asignacion de memoria y planificacion
     simulador.ejecutarTick();
     simulador.ejecutarTick();
 
@@ -179,9 +178,31 @@ describe("Pruebas para la clase Simulador", () => {
     simulador.agregarProceso(proceso);
 
     // Solo se agrega pero NO se llama a ejecutarTick()
-    // Esto deja sin cubrir la logica de paso de NUEVO a EJECUTANDO/LISTO
     expect(simulador.reloj).toBe(0);
     expect(simulador.colaNuevos.length).toBe(1);
+    expect(simulador.procesoEjecutando).toBeNull();
+  });
+  it("Debe mantener el reloj en 1 tras un unico tick con un proceso corto", () => {
+    const simulador = new Simulador(1024, 4);
+    const proceso = new Proceso(50, 100, 1); // Solo requiere 1 tick de CPU
+
+    simulador.agregarProceso(proceso);
+    simulador.ejecutarTick();
+
+    expect(simulador.reloj).toBe(1);
+    expect(simulador.colaNuevos.length).toBe(0);
+  });
+
+  it("Debe registrar la entrada de multiples procesos a colaNuevos sin alterar el reloj antes de ejecutar", () => {
+    const simulador = new Simulador(2048, 2);
+    const p1 = new Proceso(1, 200, 3);
+    const p2 = new Proceso(2, 300, 4);
+
+    simulador.agregarProceso(p1);
+    simulador.agregarProceso(p2);
+
+    expect(simulador.colaNuevos.length).toBe(2);
+    expect(simulador.reloj).toBe(0);
     expect(simulador.procesoEjecutando).toBeNull();
   });
 });
