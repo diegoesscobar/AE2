@@ -205,4 +205,30 @@ describe("Pruebas para la clase Simulador", () => {
     expect(simulador.reloj).toBe(0);
     expect(simulador.procesoEjecutando).toBeNull();
   });
+  it("Debe acumular correctamente el tiempo total de reloj tras multiples ticks con carga", () => {
+    const simulador = new Simulador(1024, 3);
+    const proceso = new Proceso(77, 150, 5); // Requiere 5 ticks de CPU
+
+    simulador.agregarProceso(proceso);
+
+    // Ejecutamos 4 ticks seguidos
+    for (let i = 0; i < 4; i++) {
+      simulador.ejecutarTick();
+    }
+
+    expect(simulador.reloj).toBe(4);
+    expect(simulador.procesoEjecutando?.id).toBe(77);
+  });
+
+  it("Debe mantener a los procesos en colaNuevos con sus propiedades intactas antes de ser procesados", () => {
+    const simulador = new Simulador(512, 2);
+    const p1 = new Proceso(10, 100, 3);
+    const p2 = new Proceso(20, 150, 4);
+
+    simulador.agregarProceso(p1);
+    simulador.agregarProceso(p2);
+
+    expect(simulador.colaNuevos[0]?.tamanioMemoria).toBe(100);
+    expect(simulador.colaNuevos[1]?.tamanioMemoria).toBe(150);
+  });
 });
