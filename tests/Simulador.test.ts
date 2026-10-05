@@ -133,4 +133,32 @@ describe("Pruebas para la clase Simulador", () => {
     expect(simulador.procesoEjecutando?.id).toBe(2);
     expect(simulador.colaNuevos.length).toBe(0);
   });
+  it("Debe reencolar en colaListos a un proceso que agota su quantum sin terminar de ejecutar", () => {
+    const simulador = new Simulador(1000, 2); // Quantum = 2
+    const procesoLargo = new Proceso(100, 200, 6); // Requiere 6 ticks
+
+    simulador.agregarProceso(procesoLargo);
+
+    simulador.ejecutarTick(); // Tick 1: Ejecuta 1/2 quantum
+    simulador.ejecutarTick(); // Tick 2: Agota quantum, debe rotar
+
+    expect(simulador.procesoEjecutando).toBeNull();
+    expect(simulador.colaListos.length).toBe(1);
+    expect(simulador.colaListos[0]?.id).toBe(100);
+  });
+
+  it("Debe mantener el orden FIFO en la colaListos al recibir multiples procesos", () => {
+    const simulador = new Simulador(1000, 5);
+    const p1 = new Proceso(1, 100, 3);
+    const p2 = new Proceso(2, 100, 3);
+
+    simulador.agregarProceso(p1);
+    simulador.agregarProceso(p2);
+
+    // Al ejecutarse el primer tick, p1 va a CPU y p2 debe estar primero en colaListos
+    simulador.ejecutarTick();
+
+    expect(simulador.procesoEjecutando?.id).toBe(1);
+    expect(simulador.colaListos[0]?.id).toBe(2);
+  });
 });
