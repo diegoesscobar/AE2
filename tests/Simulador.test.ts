@@ -231,4 +231,24 @@ describe("Pruebas para la clase Simulador", () => {
     expect(simulador.colaNuevos[0]?.tamanioMemoria).toBe(100);
     expect(simulador.colaNuevos[1]?.tamanioMemoria).toBe(150);
   });
+  it("Debe mantener el ID original del proceso durante toda la simulacion", () => {
+    const simulador = new Simulador(1024, 3);
+    const idEsperado = 88;
+    const proceso = new Proceso(idEsperado, 200, 4);
+
+    simulador.agregarProceso(proceso);
+    simulador.ejecutarTick();
+
+    expect(simulador.procesoEjecutando?.id).toBe(idEsperado);
+  });
+
+  it("Debe conservar la referencia de la cola de listos cuando solo hay un proceso ejecutando", () => {
+    const simulador = new Simulador(1024, 5);
+    const proceso = new Proceso(5, 100, 3);
+
+    simulador.agregarProceso(proceso);
+    simulador.ejecutarTick();
+
+    expect(simulador.colaListos.length).toBe(0);
+  });
 });
