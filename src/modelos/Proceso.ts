@@ -55,6 +55,10 @@ export class Proceso {
     return this._quantumConsumido;
   }
 
+  public set quantumConsumido(valor: number) {
+    this._quantumConsumido = valor;
+  }
+
   public get eventoES(): EventoES | null {
     return this._eventoES;
   }
@@ -62,11 +66,46 @@ export class Proceso {
   public get tiempoBloqueoRestante(): number {
     return this._tiempoBloqueoRestante;
   }
+
   public cambiarEstado(nuevoEstado: EstadoProceso): void {
     this._estado = nuevoEstado;
   }
 
   public estaTerminado(): boolean {
     return this._tiempoCpuRestante === 0;
+  }
+
+  public incrementarQuantum(): void {
+    this._quantumConsumido++;
+  }
+
+  public reiniciarQuantum(): void {
+    this._quantumConsumido = 0;
+  }
+
+  public descontarCpu(): void {
+    if (this._tiempoCpuRestante > 0) {
+      this._tiempoCpuRestante--;
+    }
+  }
+
+  /** Un tick de CPU: descuenta tiempo restante y suma quantum consumido. */
+  public ejecutarTick(): void {
+    this.descontarCpu();
+    this.incrementarQuantum();
+  }
+
+  /** Un tick de espera en la cola de bloqueados. */
+  public descontarBloqueo(): void {
+    if (this._tiempoBloqueoRestante > 0) {
+      this._tiempoBloqueoRestante--;
+    }
+  }
+
+  /** Inicia el bloqueo por E/S y consume el evento (se dispara una sola vez). */
+  public bloquearPorES(): void {
+    if (!this._eventoES) return;
+    this._tiempoBloqueoRestante = this._eventoES.duracionBloqueo;
+    this._eventoES = null;
   }
 }

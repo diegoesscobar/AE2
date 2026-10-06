@@ -38,6 +38,16 @@ export class Simulador {
     this.procesarCPU();
   }
 
+  /** true cuando no queda ningún proceso por atender. */
+  public haTerminado(): boolean {
+    return (
+      this.colaNuevos.length === 0 &&
+      this.colaListos.length === 0 &&
+      this.colaBloqueados.length === 0 &&
+      this.procesoEjecutando === null
+    );
+  }
+
   private intentarAsignarMemoria(): void {
     const pendientes = [...this.colaNuevos];
     this.colaNuevos = [];
@@ -57,7 +67,7 @@ export class Simulador {
     const queSiguenBloqueados: Proceso[] = [];
 
     for (const proceso of this.colaBloqueados) {
-      proceso.tiempoBloqueoRestante--;
+      proceso.descontarBloqueo(); // antes: proceso.tiempoBloqueoRestante--
       if (proceso.tiempoBloqueoRestante <= 0) {
         proceso.cambiarEstado(EstadoProceso.LISTO);
         this.colaListos.push(proceso);
@@ -71,16 +81,20 @@ export class Simulador {
 
   private procesarCPU(): void {
     if (!this.procesoEjecutando && this.colaListos.length > 0) {
-      this.procesoEjecutando = this.colaListos.shift()!;
-      this.procesoEjecutando.cambiarEstado(EstadoProceso.EJECUTANDO);
-      this.procesoEjecutando.quantumConsumido = 0;
+      const siguiente = this.colaListos.shift();
+      if (siguiente) {
+        this.procesoEjecutando = siguiente;
+        siguiente.cambiarEstado(EstadoProceso.EJECUTANDO);
+        siguiente.reiniciarQuantum(); // antes: quantumConsumido = 0
+      }
     }
 
     if (!this.procesoEjecutando) return;
 
     const p = this.procesoEjecutando;
-    p.tiempoCpuRestante--;
-    p.quantumConsumido++;
+
+    // antes: p.tiempoCpuRestante--; p.quantumConsumido++;
+    p.ejecutarTick();
 
     if (p.estaTerminado()) {
       p.cambiarEstado(EstadoProceso.TERMINADO);
@@ -90,10 +104,13 @@ export class Simulador {
       return;
     }
 
-    if (p.eventoES && (p.tiempoCpuTotal - p.tiempoCpuRestante) === p.eventoES.ticksCpuParaDisparo) {
+    if (
+      p.eventoES &&
+      p.tiempoCpuTotal - p.tiempoCpuRestante === p.eventoES.ticksCpuParaDisparo
+    ) {
       p.cambiarEstado(EstadoProceso.BLOQUEADO);
-      p.tiempoBloqueoRestante = p.eventoES.duracionBloqueo;
-      p.eventoES = null;
+      // antes: tiempoBloqueoRestante = duracionBloqueo; eventoES = null
+      p.bloquearPorES();
       this.colaBloqueados.push(p);
       this.procesoEjecutando = null;
       return;
@@ -101,7 +118,7 @@ export class Simulador {
 
     if (p.quantumConsumido >= this.quantum) {
       p.cambiarEstado(EstadoProceso.LISTO);
-      p.quantumConsumido = 0;
+      p.reiniciarQuantum(); // antes: quantumConsumido = 0
       this.colaListos.push(p);
       this.procesoEjecutando = null;
     }
