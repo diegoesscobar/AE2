@@ -6,14 +6,14 @@ export interface EventoES {
 }
 
 export class Proceso {
-  public id: number;
-  public tamanioMemoria: number;
-  public tiempoCpuTotal: number;
-  public tiempoCpuRestante: number;
-  public estado: EstadoProceso;
-  public quantumConsumido: number;
-  public eventoES: EventoES | null;
-  public tiempoBloqueoRestante: number;
+  private _id: number;
+  private _tamanioMemoria: number;
+  private _tiempoCpuTotal: number;
+  private _tiempoCpuRestante: number;
+  private _estado: EstadoProceso;
+  private _quantumConsumido: number;
+  private _eventoES: EventoES | null;
+  private _tiempoBloqueoRestante: number;
 
   constructor(
     id: number,
@@ -21,21 +21,52 @@ export class Proceso {
     tiempoCpuTotal: number,
     eventoES: EventoES | null = null
   ) {
-    this.id = id;
-    this.tamanioMemoria = tamanioMemoria;
-    this.tiempoCpuTotal = tiempoCpuTotal;
-    this.tiempoCpuRestante = tiempoCpuTotal;
-    this.estado = EstadoProceso.NUEVO;
-    this.quantumConsumido = 0;
-    this.eventoES = eventoES;
-    this.tiempoBloqueoRestante = 0;
+    this._id = id;
+    this._tamanioMemoria = tamanioMemoria;
+    this._tiempoCpuTotal = tiempoCpuTotal;
+    this._tiempoCpuRestante = tiempoCpuTotal;
+    this._estado = EstadoProceso.NUEVO;
+    this._quantumConsumido = 0;
+    this._eventoES = eventoES;
+    this._tiempoBloqueoRestante = 0;
   }
 
+  public get id(): number {
+    return this._id;
+  }
+
+  public get tamanioMemoria(): number {
+    return this._tamanioMemoria;
+  }
+
+  public get tiempoCpuTotal(): number {
+    return this._tiempoCpuTotal;
+  }
+
+  public get tiempoCpuRestante(): number {
+    return this._tiempoCpuRestante;
+  }
+
+  public get estado(): EstadoProceso {
+    return this._estado;
+  }
+
+  public get quantumConsumido(): number {
+    return this._quantumConsumido;
+  }
+
+  public get eventoES(): EventoES | null {
+    return this._eventoES;
+  }
+
+  public get tiempoBloqueoRestante(): number {
+    return this._tiempoBloqueoRestante;
+  }
   public cambiarEstado(nuevoEstado: EstadoProceso): void {
-    this.estado = nuevoEstado;
+    this._estado = nuevoEstado;
   }
 
   public estaTerminado(): boolean {
-    return this.tiempoCpuRestante === 0;
+    return this._tiempoCpuRestante === 0;
   }
 }
