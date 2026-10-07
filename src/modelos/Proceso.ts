@@ -89,20 +89,17 @@ export class Proceso {
     }
   }
 
-  /** Un tick de CPU: descuenta tiempo restante y suma quantum consumido. */
   public ejecutarTick(): void {
     this.descontarCpu();
     this.incrementarQuantum();
   }
 
-  /** Un tick de espera en la cola de bloqueados. */
   public descontarBloqueo(): void {
     if (this._tiempoBloqueoRestante > 0) {
       this._tiempoBloqueoRestante--;
     }
   }
 
-  /** Inicia el bloqueo por E/S y consume el evento (se dispara una sola vez). */
   public bloquearPorES(): void {
     if (!this._eventoES) return;
     this._tiempoBloqueoRestante = this._eventoES.duracionBloqueo;
